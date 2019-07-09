@@ -101,14 +101,23 @@ def print_mines(gameboard):
     This function prints the board, only indicating the location of mines with *.
     @param gameboard the gameboard to display
     """
+    # Making col number string
+    # 3 leading spaces for two-digit num and |
+    col_header = "   "
+    for col in range(0, len(gameboard[0])):
+        col_header += ("{:^4s}".format(str(col)))
+    print(col_header)
+    # Dashed line separator
+    print("   " + ("-" * (len(col_header) - 3)))
+    
     # want to print mine locats line-by-line
     for row in range(0,len(gameboard)):
-        row_str = ""
+        row_str = "{:>2s}|".format(str(row))
         for col in range(0,len(gameboard[0])):
             if gameboard[row][col] == -1: # Mine locat!!!
-                row_str += ' * '
+                row_str += "{:^4s}".format("*")
             else: # No mine, probably None
-                row_str += ' . '
+                row_str += "{:^4s}".format(".")
         print(row_str)
     
 
@@ -118,14 +127,23 @@ def print_board(gameboard):
     that have mines adjacent to them with the number of adjacent mines.
     @param gameboard the gameboard to display
     """
+    # Making col number string
+    # 3 leading spaces for two-digit num and |
+    col_header = "   "
+    for col in range(0, len(gameboard[0])):
+        col_header += ("{:^4s}".format(str(col)))
+    print(col_header)
+    # Dashed line separator
+    print("   " + ("-" * (len(col_header) - 3)))
+    
     # want to print locats line-by-line
     for row in range(0,len(gameboard)):
-        row_str = ""
+        row_str = "{:>2s}|".format(str(row))
         for col in range(0,len(gameboard[0])):
             if gameboard[row][col] == -1: # Mine locat!!!
-                row_str += ' * '
+                row_str += "{:^4s}".format("*")
             else: # No mine, probably None
-                row_str += (" " + str(get_mine_count(gameboard, col, row)) + " ")
+                row_str += "{:^4d}".format(get_mine_count(gameboard, col, row))
         print(row_str)
 
 
@@ -156,7 +174,7 @@ def user_view(gameboard):
             elif (gameboard[row][col] == 0): # Discovered, no adjacent mines
                 row_str += "{:^4s}".format(".")
             else: # Discovered, yes adjacent mines
-                row_str += "{:^4s}".format(str(gameboard[row][col]))
+                row_str += "{:^4d}".format(gameboard[row][col])
         print(row_str)
         
 
@@ -253,21 +271,29 @@ def game(width, height, n):
         print("Time Elapsed: {} secs".format(int(elapsed_time)))
         
         # Taking in coords
-        xy_str = input("Enter the coordinates of the cell you want to uncover (Format: x,y): ")
-        xy_li = xy_str.split(",")
-        x = int(xy_li[0])
-        y = int(xy_li[1])
-        
-        # Check if bomb
-        if gboard[y][x] == -1: # Bomb! Ya done lost!!!
-            mine_found = True # end looping of game! GAME OVER!
-            print("GAME OVER!!!")
-            # Displaying time spent trying to complete board
-            elapsed_time = time.time() - start_time
-            print("Time Elapsed: {} secs".format(int(elapsed_time)))
-            print_mines(gboard)
-        else: # No bomb!
-            uncover_board(gboard, x, y)
+        xy_str = input("Enter the coordinates of the cell you want to uncover, or 'm' before this set of coordinates to place a flag (Format: x,y): ")
+        # FLAG MODE!!!
+        if xy_str[0] == "m":
+            xy_li = xy_str[1:].split(",")
+            x = int(xy_li[0])
+            y = int(xy_li[1])
+            # place di flag...
+        # UNCOVERING MODE
+        else: 
+            xy_li = xy_str.split(",")
+            x = int(xy_li[0])
+            y = int(xy_li[1])
+            
+            # Check if bomb
+            if gboard[y][x] == -1: # Bomb! Ya done lost!!!
+                mine_found = True # end looping of game! GAME OVER!
+                print("GAME OVER!!!")
+                # Displaying time spent trying to complete board
+                elapsed_time = time.time() - start_time
+                print("Time Elapsed: {} secs".format(int(elapsed_time)))
+                print_mines(gboard)
+            else: # No bomb!
+                uncover_board(gboard, x, y)
     if not mine_found: # Meaning that discovering all non-bombs was cause of loop end, WINNER
         print("YAY!!! YOU WIN!!!")
         # Displaying time spent trying to complete board
@@ -277,7 +303,6 @@ def game(width, height, n):
 
 game(10,10,20)
 
-    
 """
 gboard = create_board(10,10)
 print("New Blank Gameboard!")
