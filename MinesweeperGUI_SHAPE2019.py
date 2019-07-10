@@ -245,14 +245,86 @@ def check_won(gameboard):
         row += 1
     return no_None
 
+
+def display_board(board, canvas):
+    widthpxl = len(board[0]) * 31
+    heightpxl = len(board) * 31
+    print(widthpxl)
+    print(heightpxl)
+    
+    for canvas_y in range(0,heightpxl,31):
+        row = canvas_y // 31
+        for canvas_x in range(0,widthpxl,31):
+            col = canvas_x // 31
+            # Cell content
+            cell_text = ''
+            if board[row][col] == -1 or board[row][col] == None: # Undiscovered, maybe mine locat
+                cell_color = 'grey'
+            elif board[row][col] == 0: # Discovered, no mines or adjacent ones
+                cell_color = 'light grey'
+            else: # Discovered, yes adjacent mines
+                cell_color = 'yellow'
+                cell_text = str(board[row][col])
+            # Cell appearance
+            canvas.create_rectangle(canvas_x, canvas_y, (canvas_x + 30), (canvas_y + 30), fill=cell_color)
+            if cell_text != '':
+                canvas.create_text(canvas_x + 15, canvas_y + 15, font="arial 20", text=cell_text)
+            
+            
+
+# GUI FUNCTION!!!!!!!!!
 def run_gui():
     """
     This function runs the GUI version of minesweeper.
     """
+    # Gboard creation
+    print("Creating your gameboard...")
+    gboard = create_board(10, 10)
+    # Burying mines
+    print("Burying mines...")
+    bury_mines(gboard, 20)
+    print_board(gboard)
     
+    # Creating window
     root = Tk()
     root.wm_title("Minesweeper")
-    heightpxl = ...
-    widthpxl = ...
+    # Prep for canvas widget
+    heightpxl = (len(gboard) * 31)
+    print(heightpxl)
+    widthpxl = (len(gboard[0]) * 31)
+    print(widthpxl)
     canvas = Canvas(master=root,height=heightpxl,width=widthpxl)
     canvas.pack()
+    
+    # Set up window
+    display_board(gboard,canvas) 
+    
+    
+    # Set-up for event handler
+    def handle_click(event):
+        # Pull coords of click and translate to row/col
+        x = event.x // 31
+        y = event.y // 31
+        print("Coords: {}, {}".format(x,y))
+        if gboard[y][x] == -1: 
+            print("GAME OVER!!!")
+            gboard[y][x] = chr(9760)
+            canvas.unbind("<Button-1>")
+        else:
+            # Change gboard val
+            uncover_board(gboard, x, y)
+        # Update view
+        display_board(gboard,canvas)
+        # Check if won
+        if check_won(gboard):
+            print("YAY!!! YOU WON!!!")
+            canvas.unbind("<Button-1>")
+
+    
+    # Binding event handler to canvas widget
+    canvas.bind("<Button-1>", handle_click)
+    # Display the window now!!
+    root.mainloop()
+    
+run_gui()
+print("Game closed.")
