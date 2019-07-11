@@ -306,7 +306,7 @@ def run_gui():
     fc2origval = {}
     # Burying mines
     print("Burying mines...")
-    bury_mines(gboard, 20)
+    bury_mines(gboard, 1)
     print_board(gboard)
     
     # Creating window
@@ -332,18 +332,25 @@ def run_gui():
             print("GAME OVER!!!")
             gboard[y][x] = chr(9760)
             canvas.unbind("<Button-1>")
+            canvas.unbind("<Button-2>")
             canvas.unbind("<Button-3>")
+            # Display loss screen
+            canvas.create_rectangle(0, 0, widthpxl - 1, heightpxl - 1, fill="red")
+            canvas.create_text(widthpxl // 2, heightpxl // 2, font="arial 20", text="YOU LOSE!!!")
         else:
             # Change gboard val
             uncover_board(gboard, x, y)
-        # Update view
-        display_board(gboard,canvas)
+            # Update view
+            display_board(gboard,canvas)
         # Check if won
         if check_won(gboard):
             print("YAY!!! YOU WON!!!")
             canvas.unbind("<Button-1>")
+            canvas.unbind("<Button-2>")
             canvas.unbind("<Button-3>")
-
+            # Display win screen
+            canvas.create_rectangle(0, 0, widthpxl - 1, heightpxl - 1, fill="green")
+            canvas.create_text(widthpxl // 2, heightpxl // 2, font="arial 20", text="YOU WIN!!!")
     def handle_click_right(event):
         # Pull coords of click and translate to row/col
         x = event.x // 31
@@ -353,7 +360,9 @@ def run_gui():
         display_board(gboard,canvas)
     
     # Binding event handler to canvas widget
+    # Right-click is Button-2 on Mac!!!! But Button-3 on Windows!!!
     canvas.bind("<Button-1>", handle_click)
+    canvas.bind("<Button-2>", handle_click_right)
     canvas.bind("<Button-3>", handle_click_right)
     # Display the window now!!
     root.mainloop()
