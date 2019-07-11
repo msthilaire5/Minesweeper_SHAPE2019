@@ -12,6 +12,7 @@ import random
 from pprint import pprint
 # For keeping track of time to solve board
 import time
+import copy
 
 def create_board(width, height):
     """
@@ -69,28 +70,28 @@ def get_mine_count(gameboard, x, y):
     rightOK = (x + 1 < width)
     
     # Up
-    if upOK and (gameboard[y-1][x] == -1):
+    if upOK and (gameboard[y-1][x] == -1 or gameboard[y-1][x] == 'X'):
         mine_count += 1
     # Down
-    if downOK and (gameboard[y+1][x] == -1):
+    if downOK and (gameboard[y+1][x] == -1 or gameboard[y+1][x] == 'X'):
         mine_count += 1
     # Left
-    if leftOK and (gameboard[y][x-1] == -1):
+    if leftOK and (gameboard[y][x-1] == -1 or gameboard[y][x-1] == 'X'):
         mine_count += 1
     # Right
-    if rightOK and (gameboard[y][x+1] == -1):
+    if rightOK and (gameboard[y][x+1] == -1 or gameboard[y][x+1] == 'X'):
         mine_count += 1
     # Northwest!
-    if leftOK and upOK and (gameboard[y-1][x-1] == -1):
+    if leftOK and upOK and (gameboard[y-1][x-1] == -1 or gameboard[y-1][x-1] == 'X'):
         mine_count += 1
     # Northeast!
-    if rightOK and upOK and (gameboard[y-1][x+1] == -1):
+    if rightOK and upOK and (gameboard[y-1][x+1] == -1 or gameboard[y-1][x+1] == 'X'):
         mine_count += 1
     # Southwest!
-    if leftOK and downOK and (gameboard[y+1][x-1] == -1):
+    if leftOK and downOK and (gameboard[y+1][x-1] == -1 or gameboard[y+1][x-1] == 'X'):
         mine_count += 1
     # Southeast!
-    if rightOK and downOK and (gameboard[y+1][x+1] == -1):
+    if rightOK and downOK and (gameboard[y+1][x+1] == -1 or gameboard[y+1][x+1] == 'X'):
         mine_count += 1
     
     return mine_count
@@ -173,6 +174,8 @@ def user_view(gameboard):
                 row_str += "{:^4s}".format("?")
             elif (gameboard[row][col] == 0): # Discovered, no adjacent mines
                 row_str += "{:^4s}".format(".")
+            elif (gameboard[row][col] == 'X' or gameboard[row][col] == 'x'): # flagged!
+                row_str += "{:^4s}".format(chr(9873))
             else: # Discovered, yes adjacent mines
                 row_str += "{:^4d}".format(gameboard[row][col])
         print(row_str)
@@ -233,6 +236,11 @@ def uncover_board(gameboard, x, y):
 
 
 def check_won(gameboard):
+    """
+    This function checks if the user won Minesweeper by making sure there aren't
+    any None values left.
+    @param gameboard the gameboard to check if the user won
+    """
     
     no_None = True
     row = 0
@@ -242,6 +250,27 @@ def check_won(gameboard):
             no_None = False
         row += 1
     return no_None
+
+
+def place_flag(gameboard, orig_val_dict, x, y):
+    """
+    This function places/removes flags on the gameboard that mark cells players
+    suspect are bombs.
+    @param gameboard the gameboard on which flags will be placed
+    @param orig_val_dict a dictionary that stores flag coords and their original contents (so they can be reverted PRN)
+    @param x the column number of the cell to flag
+    @param y the row number of the cell to flag
+    """
+    # Check if previously flagged
+    if gameboard[y][x] != 'X' and gameboard[y][x] != 'x': # Unflagged
+        orig_val_dict[(x,y)] = gameboard[y][x] # Store original value
+#        print((x,y))
+#        print(gameboard[y][x])
+        gameboard[y][x] = 'X' if gameboard[y][x] == -1 else ('x') # marker for flagged cell
+    else: # Is flagged, time to toggle
+#        print(orig_val_dict[(x,y)])
+        gameboard[y][x] = orig_val_dict[(x,y)]
+        orig_val_dict.pop((x,y))
 
 
 def game(width, height, n):
@@ -255,6 +284,8 @@ def game(width, height, n):
     # Gboard creation
     print("Creating your gameboard...")
     gboard = create_board(width, height)
+    # Dict for tracking flags!
+    fc2origval = {}
     # Burying mines
     print("Burying mines...")
     bury_mines(gboard, n)
@@ -277,7 +308,7 @@ def game(width, height, n):
             xy_li = xy_str[1:].split(",")
             x = int(xy_li[0])
             y = int(xy_li[1])
-            # place di flag...
+            place_flag(gboard,fc2origval,x,y)
         # UNCOVERING MODE
         else: 
             xy_li = xy_str.split(",")

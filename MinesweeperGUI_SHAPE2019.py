@@ -234,6 +234,27 @@ def uncover_board(gameboard, x, y):
             gameboard[y][x] = adj_mines
 
 
+def place_flag(gameboard, orig_val_dict, x, y):
+    """
+    This function places/removes flags on the gameboard that mark cells players
+    suspect are bombs.
+    @param gameboard the gameboard on which flags will be placed
+    @param orig_val_dict a dictionary that stores flag coords and their original contents (so they can be reverted PRN)
+    @param x the column number of the cell to flag
+    @param y the row number of the cell to flag
+    """
+    # Check if previously flagged
+    if gameboard[y][x] != 'X' and gameboard[y][x] != 'x': # Unflagged
+        orig_val_dict[(x,y)] = gameboard[y][x] # Store original value
+#        print((x,y))
+#        print(gameboard[y][x])
+        gameboard[y][x] = 'X' if gameboard[y][x] == -1 else ('x') # marker for flagged cell
+    else: # Is flagged, time to toggle
+#        print(orig_val_dict[(x,y)])
+        gameboard[y][x] = orig_val_dict[(x,y)]
+        orig_val_dict.pop((x,y))
+
+
 def check_won(gameboard):
     
     no_None = True
@@ -249,8 +270,6 @@ def check_won(gameboard):
 def display_board(board, canvas):
     widthpxl = len(board[0]) * 31
     heightpxl = len(board) * 31
-    print(widthpxl)
-    print(heightpxl)
     
     for canvas_y in range(0,heightpxl,31):
         row = canvas_y // 31
@@ -260,6 +279,9 @@ def display_board(board, canvas):
             cell_text = ''
             if board[row][col] == -1 or board[row][col] == None: # Undiscovered, maybe mine locat
                 cell_color = 'grey'
+            elif board[row][col] == 'X' or board[row][col] == 'x':
+                cell_color = 'light blue'
+                cell_text = chr(9873)
             elif board[row][col] == 0: # Discovered, no mines or adjacent ones
                 cell_color = 'light grey'
             else: # Discovered, yes adjacent mines
@@ -280,6 +302,8 @@ def run_gui():
     # Gboard creation
     print("Creating your gameboard...")
     gboard = create_board(10, 10)
+    # Dict for holding flagged cell values
+    fc2origval = {}
     # Burying mines
     print("Burying mines...")
     bury_mines(gboard, 20)
@@ -290,9 +314,7 @@ def run_gui():
     root.wm_title("Minesweeper")
     # Prep for canvas widget
     heightpxl = (len(gboard) * 31)
-    print(heightpxl)
     widthpxl = (len(gboard[0]) * 31)
-    print(widthpxl)
     canvas = Canvas(master=root,height=heightpxl,width=widthpxl)
     canvas.pack()
     
@@ -310,6 +332,7 @@ def run_gui():
             print("GAME OVER!!!")
             gboard[y][x] = chr(9760)
             canvas.unbind("<Button-1>")
+            canvas.unbind("<Button-3>")
         else:
             # Change gboard val
             uncover_board(gboard, x, y)
@@ -319,10 +342,19 @@ def run_gui():
         if check_won(gboard):
             print("YAY!!! YOU WON!!!")
             canvas.unbind("<Button-1>")
+            canvas.unbind("<Button-3>")
 
+    def handle_click_right(event):
+        # Pull coords of click and translate to row/col
+        x = event.x // 31
+        y = event.y // 31
+        print("Coords: {}, {}".format(x,y))
+        place_flag(gboard,fc2origval,x,y)
+        display_board(gboard,canvas)
     
     # Binding event handler to canvas widget
     canvas.bind("<Button-1>", handle_click)
+    canvas.bind("<Button-3>", handle_click_right)
     # Display the window now!!
     root.mainloop()
     
