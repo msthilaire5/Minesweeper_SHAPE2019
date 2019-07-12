@@ -306,7 +306,7 @@ def run_gui():
     fc2origval = {}
     # Burying mines
     print("Burying mines...")
-    bury_mines(gboard, 1)
+    bury_mines(gboard, 5)
     print_board(gboard)
     
     # Creating window
