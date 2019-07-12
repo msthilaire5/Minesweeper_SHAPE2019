@@ -71,28 +71,28 @@ def get_mine_count(gameboard, x, y):
     rightOK = (x + 1 < width)
     
     # Up
-    if upOK and (gameboard[y-1][x] == -1):
+    if upOK and (gameboard[y-1][x] == -1 or gameboard[y-1][x] == 'X'):
         mine_count += 1
     # Down
-    if downOK and (gameboard[y+1][x] == -1):
+    if downOK and (gameboard[y+1][x] == -1 or gameboard[y+1][x] == 'X'):
         mine_count += 1
     # Left
-    if leftOK and (gameboard[y][x-1] == -1):
+    if leftOK and (gameboard[y][x-1] == -1 or gameboard[y][x-1] == 'X'):
         mine_count += 1
     # Right
-    if rightOK and (gameboard[y][x+1] == -1):
+    if rightOK and (gameboard[y][x+1] == -1 or gameboard[y][x+1] == 'X'):
         mine_count += 1
     # Northwest!
-    if leftOK and upOK and (gameboard[y-1][x-1] == -1):
+    if leftOK and upOK and (gameboard[y-1][x-1] == -1 or gameboard[y-1][x-1] == 'X'):
         mine_count += 1
     # Northeast!
-    if rightOK and upOK and (gameboard[y-1][x+1] == -1):
+    if rightOK and upOK and (gameboard[y-1][x+1] == -1 or gameboard[y-1][x+1] == 'X'):
         mine_count += 1
     # Southwest!
-    if leftOK and downOK and (gameboard[y+1][x-1] == -1):
+    if leftOK and downOK and (gameboard[y+1][x-1] == -1 or gameboard[y+1][x-1] == 'X'):
         mine_count += 1
     # Southeast!
-    if rightOK and downOK and (gameboard[y+1][x+1] == -1):
+    if rightOK and downOK and (gameboard[y+1][x+1] == -1 or gameboard[y+1][x+1] == 'X'):
         mine_count += 1
     
     return mine_count
@@ -261,13 +261,17 @@ def check_won(gameboard):
     row = 0
     # Go row-by-row and see if any None vals left
     while no_None and row < len(gameboard):
-        if None in gameboard[row]:
+        if None in gameboard[row] or 'f' in gameboard[row]:
             no_None = False
         row += 1
     return no_None
 
 
 def display_board(board, canvas):
+    
+    # Prevent slowing down so not just piling stuff on top of shtuff
+    canvas.delete("all")
+    
     widthpxl = len(board[0]) * 31
     heightpxl = len(board) * 31
     
@@ -306,7 +310,7 @@ def run_gui():
     fc2origval = {}
     # Burying mines
     print("Burying mines...")
-    bury_mines(gboard, 5)
+    bury_mines(gboard, 10)
     print_board(gboard)
     
     # Creating window
