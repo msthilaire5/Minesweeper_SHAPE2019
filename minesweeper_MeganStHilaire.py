@@ -246,7 +246,7 @@ def check_won(gameboard):
     row = 0
     # Go row-by-row and see if any None vals left
     while no_None and row < len(gameboard):
-        if None in gameboard[row]:
+        if None in gameboard[row] or 'x' in gameboard[row]:
             no_None = False
         row += 1
     return no_None
