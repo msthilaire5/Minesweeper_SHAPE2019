@@ -6,20 +6,18 @@ Created on Tue Jul  2 17:02:04 2019
 @author: msthilaire
 """
 
-# For random coords of mine locations
 import random
 # For pretty display of gameboard list of lists
 from pprint import pprint
 # For keeping track of time to solve board
 import time
-import copy
 
 def create_board(width, height):
     """
     This function creates a new blank gameboard filled with None values.
-    @param width the number of columns gameboard will have
-    @param height the number of rows gameboard will have
-    @return the blank gameboard filled with None values
+    @param width: the number of columns gameboard will have
+    @param height: the number of rows gameboard will have
+    @return: the blank gameboard filled with None values
     """
     board = [] # final gameboard to return
     
@@ -35,8 +33,8 @@ def create_board(width, height):
 def bury_mines(gameboard,n):
     """
     This function buries mines at random locations on a gameboard.
-    @param gameboard the gameboard to bury mines in
-    @param n the number of mines to bury
+    @param gameboard: the gameboard to bury mines in
+    @param n: the number of mines to bury
     """
     # keep track of how many mines we've buried so far
     mines_buried = 0
@@ -54,10 +52,10 @@ def get_mine_count(gameboard, x, y):
     """
     This function counts how many mines are in the cells adjacent to the cell 
     whose coordinates are given.
-    @param gameboard the gameboard with the cell in question
-    @param x the col number of the cell in question
-    @param y the row number of the cell in question
-    @return the number of mines adjacent to the cell denoted by x and y
+    @param gameboard: the gameboard with the cell in question
+    @param x: the col number of the cell in question
+    @param y: the row number of the cell in question
+    @return: the number of mines adjacent to the cell denoted by x and y
     """
     mine_count = 0
     height = len(gameboard)
@@ -100,7 +98,7 @@ def get_mine_count(gameboard, x, y):
 def print_mines(gameboard):
     """
     This function prints the board, only indicating the location of mines with *.
-    @param gameboard the gameboard to display
+    @param gameboard: the gameboard to display
     """
     # Making col number string
     # 3 leading spaces for two-digit num and |
@@ -126,7 +124,7 @@ def print_board(gameboard):
     """
     This function prints the board, indicating mine locations with * and cells 
     that have mines adjacent to them with the number of adjacent mines.
-    @param gameboard the gameboard to display
+    @param gameboard: the gameboard to display
     """
     # Making col number string
     # 3 leading spaces for two-digit num and |
@@ -154,7 +152,7 @@ def user_view(gameboard):
         - '.' if discovered with 0 adjacent mines
         - '?' if undiscovered with None or a mine
         - a positive int if discovered with adjacent mines
-    @param gameboard the gameboard to display
+    @param gameboard: the gameboard to display
     """
     
     # Making col number string
@@ -186,9 +184,9 @@ def uncover_board(gameboard, x, y):
     'CASCADING ALGORITHM'
     This function uncovers cells on the board. Reveals whether they are mines,
     empty, or have mines adjacent to them.
-    @param gameboard the gameboard whose cells will be uncovered
-    @param x the column of the cell to uncover
-    @param y the row of the cell to uncover
+    @param gameboard: the gameboard whose cells will be uncovered
+    @param x: the column of the cell to uncover
+    @param y: the row of the cell to uncover
     """
     if gameboard[y][x] in [-1, None]: # Still undiscovered, not a mine!
         adj_mines = get_mine_count(gameboard,x,y)
@@ -239,7 +237,7 @@ def check_won(gameboard):
     """
     This function checks if the user won Minesweeper by making sure there aren't
     any None values left.
-    @param gameboard the gameboard to check if the user won
+    @param gameboard: the gameboard to check if the user won
     """
     
     no_None = True
@@ -257,9 +255,9 @@ def place_flag(gameboard, orig_val_dict, x, y):
     This function places/removes flags on the gameboard that mark cells players
     suspect are bombs.
     @param gameboard the gameboard on which flags will be placed
-    @param orig_val_dict a dictionary that stores flag coords and their original contents (so they can be reverted PRN)
-    @param x the column number of the cell to flag
-    @param y the row number of the cell to flag
+    @param orig_val_dict: a dictionary that stores flag coords and their original contents (so they can be reverted PRN)
+    @param x: the column number of the cell to flag
+    @param y: the row number of the cell to flag
     """
     # Check if previously flagged
     if gameboard[y][x] != 'X' and gameboard[y][x] != 'x': # Unflagged
@@ -277,9 +275,9 @@ def game(width, height, n):
     """
     This function executes a game of mine sweeper with the given height, width,
     and number of mines.
-    @param height the number of rows in the gameboard
-    @param width the number of columns in the gameboard
-    @param n the number of mines randomly placed on the gameboard
+    @param height: the number of rows in the gameboard
+    @param width: the number of columns in the gameboard
+    @param n: the number of mines randomly placed on the gameboard
     """
     # Gboard creation
     print("Creating your gameboard...")
@@ -332,7 +330,7 @@ def game(width, height, n):
         print("Time Elapsed: {} secs".format(int(elapsed_time)))
     
 
-game(10,10,20)
+# game(10,10,20)
 
 """
 gboard = create_board(10,10)
